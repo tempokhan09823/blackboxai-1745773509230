@@ -1,0 +1,78 @@
+<template>
+    <lightning-card title="Task Management Board">
+        <div class="slds-p-around_medium">
+            <div class="slds-grid slds-wrap slds-gutters">
+                <div class="slds-col slds-size_1-of-4">
+                    <lightning-combobox
+                        name="projectFilter"
+                        label="Project"
+                        value={projectFilter}
+                        options={projectOptions}
+                        onchange={handleProjectChange}>
+                    </lightning-combobox>
+                </div>
+                <div class="slds-col slds-size_1-of-4">
+                    <lightning-combobox
+                        name="statusFilter"
+                        label="Status"
+                        value={statusFilter}
+                        options={statusOptions}
+                        onchange={handleStatusChange}>
+                    </lightning-combobox>
+                </div>
+                <div class="slds-col slds-size_1-of-4">
+                    <lightning-combobox
+                        name="assignedToFilter"
+                        label="Assigned To"
+                        value={assignedToFilter}
+                        options={assignedToOptions}
+                        onchange={handleAssignedToChange}>
+                    </lightning-combobox>
+                </div>
+                <div class="slds-col slds-size_1-of-4">
+                    <lightning-input type="date" label="Start Date" value={startDate} onchange={handleStartDateChange}></lightning-input>
+                    <lightning-input type="date" label="End Date" value={endDate} onchange={handleEndDateChange}></lightning-input>
+                </div>
+            </div>
+            <div class="slds-m-top_medium">
+                <lightning-button label="Add Task" onclick={handleAddTask} variant="brand"></lightning-button>
+            </div>
+            <div class="slds-grid slds-gutters slds-m-top_medium">
+                <template for:each={statusColumns} for:item="status">
+                    <div key={status} class="slds-col slds-size_1-of-3 slds-box slds-m-around_x-small" ondragover={handleDragOver} ondrop={handleDrop} data-status={status}>
+                        <h3 class="slds-text-heading_small">{status}</h3>
+                        <template for:each={tasksByStatus[status]} for:item="task">
+                            <div key={task.Id} class="task-card slds-box slds-m-around_xx-small" draggable="true" ondragstart={handleDragStart} data-task-id={task.Id}>
+                                <p class="slds-text-heading_small">{task.Subject}</p>
+                                <p>Assigned To: {task.OwnerName}</p>
+                                <p>Due: {task.ActivityDate}</p>
+                                <lightning-button-icon icon-name="utility:edit" alternative-text="Edit Task" onclick={handleEditTask} data-task-id={task.Id}></lightning-button-icon>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </lightning-card>
+
+    <template if:true={isModalOpen}>
+        <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <h2 id="modal-heading" class="slds-modal__title">{modalTitle}</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium">
+                    <lightning-input label="Subject" value={taskSubject} onchange={handleSubjectChange}></lightning-input>
+                    <lightning-combobox label="Status" value={taskStatus} options={statusOptions} onchange={handleTaskStatusChange}></lightning-combobox>
+                    <lightning-combobox label="Assigned To" value={taskOwnerId} options={assignedToOptions} onchange={handleTaskOwnerChange}></lightning-combobox>
+                    <lightning-input type="date" label="Due Date" value={taskActivityDate} onchange={handleTaskActivityDateChange}></lightning-input>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning-button variant="neutral" label="Cancel" onclick={closeModal}></lightning-button>
+                    <lightning-button variant="brand" label="Save" onclick={saveTask}></lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>
